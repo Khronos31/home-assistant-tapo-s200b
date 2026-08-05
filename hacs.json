@@ -1,0 +1,6 @@
+{
+  "name": "Tapo S200B/S200D",
+  "content_in_root": false,
+  "homeassistant": "2026.7.4",
+  "render_readme": true
+}

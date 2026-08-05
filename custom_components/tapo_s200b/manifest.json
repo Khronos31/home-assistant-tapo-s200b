@@ -1,0 +1,14 @@
+{
+  "domain": "tapo_s200b",
+  "name": "Tapo S200B/S200D",
+  "after_dependencies": ["tplink"],
+  "codeowners": ["@Khronos31"],
+  "config_flow": true,
+  "documentation": "https://github.com/Khronos31/home-assistant-tapo-s200b",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/Khronos31/home-assistant-tapo-s200b/issues",
+  "loggers": ["plugp100"],
+  "requirements": ["plugp100==6.0.0.dev2"],
+  "version": "0.1.0"
+}

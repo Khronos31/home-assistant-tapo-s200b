@@ -1,0 +1,16 @@
+.venv/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+coverage.xml
+htmlcov/
+.coverage
+artifacts/
+tapo-probe-output/
+tapo_probe*.json
+tapo_probe*.jsonl
+tapo_probe*.log
+tapo_readonly_probe*.json
+tapo_readonly_probe*.jsonl
+tapo_readonly_probe*.log

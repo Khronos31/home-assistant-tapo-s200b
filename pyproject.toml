@@ -1,0 +1,21 @@
+[project]
+name = "home-assistant-tapo-s200b"
+version = "0.1.0"
+description = "Home Assistant event integration for Tapo S200B and S200D buttons"
+requires-python = ">=3.14.2"
+license = "GPL-3.0-only"
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+preview = true
+target-version = "py314"
+
+[tool.ruff.lint]
+ignore = ["RUF029"] # Home Assistant and aiohttp require async callback signatures.
+select = ["E", "F", "I", "UP", "B", "ASYNC", "RUF"]

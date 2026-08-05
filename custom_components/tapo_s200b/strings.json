@@ -1,0 +1,72 @@
+{
+  "title": "Tapo S200B/S200D",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to a Tapo hub",
+        "description": "Enter the private IP address of an H110C and your Tapo account credentials.",
+        "data": {
+          "host": "Hub IP address",
+          "email": "Tapo account email",
+          "password": "Tapo account password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Update Tapo credentials",
+        "data": {
+          "email": "Tapo account email",
+          "password": "Tapo account password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the hub",
+      "invalid_auth": "The Tapo credentials were rejected",
+      "invalid_host": "Enter an RFC 1918 private IPv4 address",
+      "no_buttons": "The hub has no S200B or S200D children",
+      "unsupported_hub": "The device is not a supported H110C family hub",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This hub is already configured",
+      "reauth_successful": "Credentials updated"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling options",
+        "data": {
+          "poll_interval": "Polling interval (seconds)",
+          "page_size": "Events per page"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "cloud_connection": {
+        "name": "Cloud connection"
+      },
+      "battery_low": {
+        "name": "Battery"
+      }
+    },
+    "sensor": {
+      "signal_level": {
+        "name": "Signal level"
+      },
+      "rssi": {
+        "name": "Signal strength"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Reboot"
+      },
+      "unpair": {
+        "name": "Unpair device"
+      }
+    }
+  }
+}

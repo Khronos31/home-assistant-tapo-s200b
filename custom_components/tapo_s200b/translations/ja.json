@@ -1,0 +1,72 @@
+{
+  "title": "Tapo S200B/S200D",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tapoハブへ接続",
+        "description": "H110CのプライベートIPアドレスとTapoアカウントの認証情報を入力します。",
+        "data": {
+          "host": "ハブのIPアドレス",
+          "email": "Tapoアカウントのメールアドレス",
+          "password": "Tapoアカウントのパスワード"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Tapo認証情報を更新",
+        "data": {
+          "email": "Tapoアカウントのメールアドレス",
+          "password": "Tapoアカウントのパスワード"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "ハブへ接続できませんでした",
+      "invalid_auth": "Tapoの認証情報が拒否されました",
+      "invalid_host": "RFC 1918のプライベートIPv4アドレスを入力してください",
+      "no_buttons": "このハブにはS200BまたはS200Dがありません",
+      "unsupported_hub": "対応するH110C系ハブではありません",
+      "unknown": "予期しないエラーが発生しました"
+    },
+    "abort": {
+      "already_configured": "このハブは設定済みです",
+      "reauth_successful": "認証情報を更新しました"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ポーリング設定",
+        "data": {
+          "poll_interval": "ポーリング間隔（秒）",
+          "page_size": "1ページあたりのイベント数"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "cloud_connection": {
+        "name": "クラウド接続"
+      },
+      "battery_low": {
+        "name": "バッテリー"
+      }
+    },
+    "sensor": {
+      "signal_level": {
+        "name": "信号レベル"
+      },
+      "rssi": {
+        "name": "信号強度"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "再起動"
+      },
+      "unpair": {
+        "name": "デバイスのペアリングを解除"
+      }
+    }
+  }
+}
