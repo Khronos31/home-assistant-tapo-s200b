@@ -1,2 +1,2 @@
 # This helper release pins and tests against Home Assistant 2026.7.4.
-pytest-homeassistant-custom-component==0.13.348
+pytest-homeassistant-custom-component==0.13.355
