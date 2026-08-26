@@ -24,6 +24,7 @@ from .connection import (
 )
 from .const import (
     CONF_EMAIL,
+    CONF_MAC,
     CONF_PAGE_SIZE,
     CONF_POLL_INTERVAL,
     DEFAULT_PAGE_SIZE,
@@ -46,6 +47,7 @@ class CannotConnectError(ConnectionError):
 class ValidationResult:
     hub_id: str
     title: str
+    mac: str
 
 
 def _credentials_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
@@ -108,6 +110,7 @@ async def async_validate_input(
         return ValidationResult(
             hub_id=connection.hub.device_id,
             title=connection.hub.nickname or f"Tapo hub {host}",
+            mac=connection.hub.mac,
         )
     except (InvalidAuthentication, UnsupportedHubError, NoButtonsError):
         raise
@@ -153,7 +156,7 @@ class TapoS200BConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 return self.async_create_entry(
                     title=result.title,
-                    data=normalized,
+                    data={**normalized, CONF_MAC: result.mac},
                     options={
                         CONF_POLL_INTERVAL: DEFAULT_POLL_INTERVAL,
                         CONF_PAGE_SIZE: DEFAULT_PAGE_SIZE,

@@ -31,6 +31,12 @@ from .const import (
     SUPPORTED_BUTTON_MODELS,
     SUPPORTED_HUB_MODELS,
 )
+from .discovery import (
+    AmbiguousHubError,
+    HubNotFoundError,
+    async_resolve_hub,
+    normalize_mac,
+)
 
 
 class UnsupportedHubError(ValueError):
@@ -89,6 +95,7 @@ class HubDescription:
     firmware_version: str | None
     hardware_version: str | None
     protocol_version: str
+    host: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -150,13 +157,59 @@ class HubConnection:
 
 
 async def async_get_connection(
-    hass: HomeAssistant, host: str, email: str, password: str
+    hass: HomeAssistant,
+    host: str,
+    email: str,
+    password: str,
+    *,
+    expected_device_id: str | None = None,
+    expected_mac: str | None = None,
 ) -> HubConnection:
-    """Prefer the official TP-Link transport, falling back to standalone KLAP."""
-    host = normalize_host(host)
-    if shared := _async_get_shared_connection(hass, host):
-        return shared
-    return await async_connect_hub(hass, host, email, password)
+    """Resolve a stable identity, then select shared or standalone transport."""
+    resolved_host = normalize_host(host)
+    if expected_device_id or expected_mac:
+        try:
+            discovered = await async_resolve_hub(
+                hass,
+                expected_device_id=expected_device_id,
+                expected_mac=expected_mac,
+            )
+        except HubNotFoundError:
+            # Broadcast discovery is not guaranteed to cross every network
+            # boundary. Keep a known-good static address usable, but still
+            # authenticate it and verify the persisted stable identity below.
+            pass
+        else:
+            resolved_host = normalize_host(discovered.host)
+
+    connection = _async_get_shared_connection(hass, resolved_host)
+    if connection is None:
+        connection = await async_connect_hub(hass, resolved_host, email, password)
+    try:
+        _verify_connection_identity(
+            connection,
+            expected_device_id=expected_device_id,
+            expected_mac=expected_mac,
+        )
+    except BaseException:
+        await connection.async_close()
+        raise
+    return connection
+
+
+def _verify_connection_identity(
+    connection: HubConnection,
+    *,
+    expected_device_id: str | None,
+    expected_mac: str | None,
+) -> None:
+    """Reject a connected device that contradicts the persisted identity."""
+    if expected_device_id and connection.hub.device_id != expected_device_id:
+        raise AmbiguousHubError
+    if expected_mac and normalize_mac(connection.hub.mac) != normalize_mac(
+        expected_mac
+    ):
+        raise AmbiguousHubError
 
 
 def _async_get_shared_connection(
@@ -204,6 +257,7 @@ def _async_get_shared_connection(
             firmware_version=_hardware_value(device, "sw_ver"),
             hardware_version=_hardware_value(device, "hw_ver"),
             protocol_version="python-kasa shared KLAP",
+            host=host,
         ),
         buttons=buttons,
         transport="tplink_shared",
@@ -353,6 +407,7 @@ async def async_connect_hub(
                 firmware_version=device.firmware_version,
                 hardware_version=device.hardware_version,
                 protocol_version=device.protocol_version,
+                host=host,
             ),
             buttons=tuple(
                 _plugp100_button(child, request_lock) for child in raw_buttons

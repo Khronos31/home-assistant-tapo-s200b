@@ -78,17 +78,24 @@ configuration directory, then restart Home Assistant.
 
 ## Configuration
 
-1. Give the H110/H110C a stable DHCP lease.
+1. A stable DHCP lease is recommended but no longer required.
 2. In Home Assistant, open **Settings → Devices & services → Add integration**.
 3. Search for **Tapo S200B/S200D**.
 4. Enter the hub's RFC 1918 IPv4 address and the email/password for the Tapo
    account that owns it.
 
 Each hub is a separate config entry, so multiple hubs are supported. If the
-official **TP-Link Smart Home** integration already has a loaded config entry
-for the same IP address, this integration reuses that exact python-kasa device
-and KLAP session. Its raw event-log requests are serialized by python-kasa's
-per-device lock, so existing temperature, humidity, motion, siren, and config
+saved address changes, the integration uses plugp100's credential-free local
+discovery to find the same hub by MAC (or device ID for legacy entries without
+a known MAC). It then verifies the authenticated device ID and MAC before
+saving the new address. This repair does not require the official TP-Link
+integration.
+
+If the official **TP-Link Smart Home** integration already has a loaded config
+entry for the same IP address, this integration reuses that exact python-kasa
+device and KLAP session. Its raw event-log requests are serialized by
+python-kasa's per-device lock, so existing temperature, humidity, motion, siren,
+and config
 entities keep working. If no matching official entry exists, the integration
 opens its own standalone plugp100 connection.
 
@@ -190,8 +197,10 @@ they are then delivered as a batch.
 - Only S200B/S200D event logs, passive diagnostics, and the two opt-in
   maintenance actions documented above are in scope. Other sensors and
   actuators are not exposed.
-- Automatic network discovery is not implemented.
-- Shared mode deliberately follows Home Assistant 2026.7.4's TP-Link runtime
+- Automatic address repair performs a bounded three-second UDP discovery and
+  shares the result among concurrent entries for 30 seconds. Initial setup
+  still requires the hub's current private IPv4 address.
+- Shared mode deliberately follows Home Assistant 2026.8.1's TP-Link runtime
   structure and python-kasa 0.10.2 raw-query API. A future core refactor may
   require a compatibility update.
 
@@ -212,7 +221,7 @@ they are then delivered as a batch.
 
 ## Development
 
-The test environment targets Home Assistant 2026.7.4 and Python 3.14.2. CI also
+The test environment targets Home Assistant 2026.8.1 and Python 3.14. CI also
 upgrades a second test lane to the latest Home Assistant release so scheduled
 runs expose compatibility regressions after new core releases.
 

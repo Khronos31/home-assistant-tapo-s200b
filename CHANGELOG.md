@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Discover configured hubs by stable device ID and MAC, repair DHCP address
+  changes only after authenticated identity verification, and keep discovery
+  independent of the official TP-Link integration.
 - Deliver each child's persisted events without waiting for later child-log
   reads, and avoid polling disabled Event entities.
 - Use a 10-record fast first page while preserving configured catch-up depth,

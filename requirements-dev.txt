@@ -1,4 +1,4 @@
-homeassistant==2026.7.4
+homeassistant==2026.8.1
 plugp100==6.0.0.dev2
 python-kasa[speedups]==0.10.2
 pytest==9.0.3

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.config_entries import ConfigEntryState
@@ -29,6 +29,11 @@ from custom_components.tapo_s200b.const import (
     DIAGNOSTIC_RSSI,
     DIAGNOSTIC_SIGNAL_LEVEL,
     DIAGNOSTIC_UNPAIR,
+)
+from custom_components.tapo_s200b.discovery import (
+    AmbiguousHubError,
+    DiscoveredHub,
+    HubNotFoundError,
 )
 
 
@@ -95,9 +100,25 @@ async def test_shared_connection_reuses_official_tplink_protocol(hass) -> None:
     )
     entry.add_to_hass(hass)
 
-    connection = await async_get_connection(
-        hass, "192.168.50.10", "unused@example.com", "unused"
-    )
+    with patch(
+        "custom_components.tapo_s200b.connection.async_resolve_hub",
+        AsyncMock(
+            return_value=DiscoveredHub(
+                "192.168.50.10",
+                "H110",
+                "hub-id",
+                "AA:BB:CC:DD:EE:FF",
+            )
+        ),
+    ):
+        connection = await async_get_connection(
+            hass,
+            "192.168.50.5",
+            "unused@example.com",
+            "unused",
+            expected_device_id="hub-id",
+            expected_mac="AA:BB:CC:DD:EE:FF",
+        )
     response = await connection.buttons[0].async_get_trigger_logs(50, 0)
 
     assert connection.transport == "tplink_shared"
@@ -106,6 +127,144 @@ async def test_shared_connection_reuses_official_tplink_protocol(hass) -> None:
         "get_trigger_logs": {"page_size": 50, "start_id": 0}
     })
     await connection.async_close()
+
+
+async def test_discovery_connects_standalone_without_official_integration(hass) -> None:
+    close = AsyncMock()
+    connection = HubConnection(
+        HubDescription(
+            "hub-id",
+            "AA:BB:CC:DD:EE:FF",
+            "H110C",
+            "Hub",
+            "1",
+            "1",
+            "Klap V2",
+            "192.168.50.20",
+        ),
+        (),
+        "standalone_plugp100",
+        close,
+    )
+    with (
+        patch(
+            "custom_components.tapo_s200b.connection.async_resolve_hub",
+            AsyncMock(
+                return_value=DiscoveredHub(
+                    "192.168.50.20",
+                    "H110C",
+                    "hub-id",
+                    "AA:BB:CC:DD:EE:FF",
+                )
+            ),
+        ),
+        patch(
+            "custom_components.tapo_s200b.connection.async_connect_hub",
+            AsyncMock(return_value=connection),
+        ) as connect_hub,
+    ):
+        result = await async_get_connection(
+            hass,
+            "192.168.50.10",
+            "user@example.com",
+            "secret",
+            expected_device_id="hub-id",
+            expected_mac="AA:BB:CC:DD:EE:FF",
+        )
+
+    assert result is connection
+    connect_hub.assert_awaited_once_with(
+        hass, "192.168.50.20", "user@example.com", "secret"
+    )
+
+
+async def test_missing_discovery_result_uses_verified_configured_host(hass) -> None:
+    close = AsyncMock()
+    connection = HubConnection(
+        HubDescription(
+            "hub-id",
+            "AA:BB:CC:DD:EE:FF",
+            "H110",
+            "Hub",
+            "1",
+            "1",
+            "Klap V2",
+            "192.168.50.10",
+        ),
+        (),
+        "standalone_plugp100",
+        close,
+    )
+    with (
+        patch(
+            "custom_components.tapo_s200b.connection.async_resolve_hub",
+            AsyncMock(side_effect=HubNotFoundError),
+        ),
+        patch(
+            "custom_components.tapo_s200b.connection.async_connect_hub",
+            AsyncMock(return_value=connection),
+        ) as connect_hub,
+    ):
+        result = await async_get_connection(
+            hass,
+            "192.168.50.10",
+            "user@example.com",
+            "secret",
+            expected_device_id="hub-id",
+            expected_mac="AA:BB:CC:DD:EE:FF",
+        )
+
+    assert result is connection
+    connect_hub.assert_awaited_once_with(
+        hass, "192.168.50.10", "user@example.com", "secret"
+    )
+
+
+async def test_connected_identity_mismatch_is_closed(hass) -> None:
+    close = AsyncMock()
+    connection = HubConnection(
+        HubDescription(
+            "other-hub",
+            "11:22:33:44:55:66",
+            "H110",
+            "Other",
+            "1",
+            "1",
+            "Klap V2",
+            "192.168.50.20",
+        ),
+        (),
+        "standalone_plugp100",
+        close,
+    )
+    with (
+        patch(
+            "custom_components.tapo_s200b.connection.async_resolve_hub",
+            AsyncMock(
+                return_value=DiscoveredHub(
+                    "192.168.50.20",
+                    "H110",
+                    "hub-id",
+                    "AA:BB:CC:DD:EE:FF",
+                )
+            ),
+        ),
+        patch(
+            "custom_components.tapo_s200b.connection.async_connect_hub",
+            AsyncMock(return_value=connection),
+        ),
+    ):
+        with pytest.raises(AmbiguousHubError):
+            await async_get_connection(
+                hass,
+                "192.168.50.10",
+                "user@example.com",
+                "secret",
+                expected_device_id="hub-id",
+                expected_mac="AA:BB:CC:DD:EE:FF",
+            )
+
+    close.assert_awaited_once()
 
 
 async def test_shared_button_resolves_reloaded_official_device(hass) -> None:
