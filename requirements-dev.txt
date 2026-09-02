@@ -3,4 +3,4 @@ plugp100==6.0.0.dev2
 python-kasa[speedups]==0.10.2
 pytest==9.0.3
 pytest-asyncio==1.4.0
-ruff==0.12.7
+ruff==0.16.5
