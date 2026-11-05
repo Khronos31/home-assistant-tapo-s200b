@@ -122,7 +122,7 @@ async def async_validate_input(
 
 
 class TapoS200BConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Configure one H110C hub."""
+    """Configure one supported Tapo hub."""
 
     VERSION = 1
 

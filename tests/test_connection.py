@@ -64,7 +64,8 @@ async def test_connection_runs_only_its_own_close_callback() -> None:
     close.assert_awaited_once()
 
 
-async def test_shared_connection_reuses_official_tplink_protocol(hass) -> None:
+@pytest.mark.parametrize("model", ["H100", "H110", "H110C"])
+async def test_shared_connection_reuses_official_tplink_protocol(hass, model) -> None:
     query = AsyncMock(
         return_value={
             "get_trigger_logs": {
@@ -84,7 +85,7 @@ async def test_shared_connection_reuses_official_tplink_protocol(hass) -> None:
     device = SimpleNamespace(
         device_id="hub-id",
         mac="AA:BB:CC:DD:EE:FF",
-        model="H110",
+        model=model,
         alias="Hub",
         hw_info={"sw_ver": "1.2", "hw_ver": "3.0"},
         children=(child,),
@@ -105,7 +106,7 @@ async def test_shared_connection_reuses_official_tplink_protocol(hass) -> None:
         AsyncMock(
             return_value=DiscoveredHub(
                 "192.168.50.10",
-                "H110",
+                model,
                 "hub-id",
                 "AA:BB:CC:DD:EE:FF",
             )

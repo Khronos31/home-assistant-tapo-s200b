@@ -13,12 +13,12 @@ permissions:
 jobs:
   tests:
     name: Tests (Home Assistant ${{ matrix.homeassistant }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         homeassistant:
-          - "2026.7.4"
+          - "2026.8.1"
           - latest
     steps:
       - uses: actions/checkout@v7

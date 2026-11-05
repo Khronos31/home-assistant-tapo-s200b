@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.1
 
+- Add H100 to supported hubs, based on community testing with an S200D (#22).
 - Discover configured hubs by stable device ID and MAC, repair DHCP address
   changes only after authenticated identity verification, and keep discovery
   independent of the official TP-Link integration.

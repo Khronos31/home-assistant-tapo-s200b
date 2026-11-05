@@ -1,4 +1,4 @@
-"""Create a read-only connection to a Tapo H110C hub."""
+"""Create a connection to a supported Tapo hub."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ from .discovery import (
 
 
 class UnsupportedHubError(ValueError):
-    """Raised when the supplied address is not a supported H110C family hub."""
+    """Raised when the supplied address is not a supported Tapo hub."""
 
 
 class NoButtonsError(ValueError):

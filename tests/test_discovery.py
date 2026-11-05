@@ -40,10 +40,11 @@ def test_normalize_mac_accepts_common_formats_and_rejects_invalid() -> None:
     assert normalize_mac("not-a-mac") is None
 
 
-async def test_resolves_h110c_by_exact_device_id_and_mac(hass) -> None:
+@pytest.mark.parametrize("model", ["H100(EU)", "H110(EU)", "H110C(JP)"])
+async def test_resolves_supported_hub_by_exact_device_id_and_mac(hass, model) -> None:
     with patch(
         "custom_components.tapo_s200b.discovery.TapoDiscovery.scan",
-        AsyncMock(return_value=[discovered("192.168.50.20", model="H110C(JP)")]),
+        AsyncMock(return_value=[discovered("192.168.50.20", model=model)]),
     ):
         result = await async_resolve_hub(
             hass,
@@ -52,7 +53,7 @@ async def test_resolves_h110c_by_exact_device_id_and_mac(hass) -> None:
         )
 
     assert result.host == "192.168.50.20"
-    assert result.model == "H110C"
+    assert result.model == model.split("(", 1)[0]
     assert result.mac == "AA:BB:CC:DD:EE:FF"
 
 

@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Tapoハブへ接続",
-        "description": "H110CのプライベートIPアドレスとTapoアカウントの認証情報を入力します。",
+        "description": "H100・H110・H110CのプライベートIPアドレスとTapoアカウントの認証情報を入力します。",
         "data": {
           "host": "ハブのIPアドレス",
           "email": "Tapoアカウントのメールアドレス",
@@ -24,7 +24,7 @@
       "invalid_auth": "Tapoの認証情報が拒否されました",
       "invalid_host": "RFC 1918のプライベートIPv4アドレスを入力してください",
       "no_buttons": "このハブにはS200BまたはS200Dがありません",
-      "unsupported_hub": "対応するH110C系ハブではありません",
+      "unsupported_hub": "対応するH100・H110・H110Cハブではありません",
       "unknown": "予期しないエラーが発生しました"
     },
     "abort": {

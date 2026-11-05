@@ -1,7 +1,7 @@
 # Home Assistant Tapo S200B/S200D
 
 A local-polling Home Assistant custom integration for TP-Link Tapo S200B smart
-buttons and S200D smart remote dimmers connected to an H110/H110C hub.
+buttons and S200D smart remote dimmers connected to an H100/H110/H110C hub.
 
 The integration creates one Home Assistant **Event entity** for each supported
 child control. Event collection and passive diagnostics are read-only. Two
@@ -17,9 +17,12 @@ explicitly enables their disabled-by-default entities.
 
 | Hardware | Support |
 | --- | --- |
-| Tapo H110 / H110C | Hub connection |
+| Tapo H100 / H110 / H110C | Hub connection |
 | Tapo S200B | Single click, double click |
 | Tapo S200D | Single click, double click, left/right rotation |
+
+H100 support with an S200D has been confirmed by a community report
+([#22](https://github.com/Khronos31/home-assistant-tapo-s200b/issues/22)).
 
 Event types are:
 
@@ -206,7 +209,7 @@ they are then delivered as a batch.
 
 ## Troubleshooting
 
-- Confirm that the IP belongs to an H110/H110C and is reachable from Home
+- Confirm that the IP belongs to an H100/H110/H110C and is reachable from Home
   Assistant.
 - Confirm the same credentials work in the Tapo app. Use the integration's
   reauthentication flow after changing the account password.
@@ -250,7 +253,7 @@ license; their source and trademark notice are documented in
 
 ## 日本語の要約
 
-H110/H110C配下のS200B/S200Dを、イベントエンティティとしてHome Assistantへ
+H100/H110/H110C配下のS200B/S200Dを、イベントエンティティとしてHome Assistantへ
 追加します。公式統合相当の診断6項目もすべて既定無効で登録されます。診断項目を
 有効化するまで追加の診断ポーリングは行いません。再起動とペアリング解除は、該当する
 ボタンエンティティを明示的に有効化して押した場合だけ実行されます。特にペアリング解除後は
