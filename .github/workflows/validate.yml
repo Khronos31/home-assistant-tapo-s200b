@@ -36,7 +36,8 @@ jobs:
       - name: Ruff lint
         run: ruff check .
       - name: Pytest
-        run: pytest -q
+        # Newer HA versions alias httpx before test plugins import it.
+        run: python -c 'import homeassistant; import pytest; raise SystemExit(pytest.main(["-q"]))'
 
   hassfest:
     runs-on: ubuntu-latest
