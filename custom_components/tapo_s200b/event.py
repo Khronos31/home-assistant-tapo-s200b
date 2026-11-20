@@ -52,7 +52,6 @@ class TapoButtonEvent(CoordinatorEntity[TapoS200BCoordinator], EventEntity):
             name=child.nickname,
             sw_version=child.firmware_version,
             hw_version=child.hardware_version,
-            via_device=(DOMAIN, coordinator.connection.hub.device_id),
         )
 
     async def async_added_to_hass(self) -> None:
